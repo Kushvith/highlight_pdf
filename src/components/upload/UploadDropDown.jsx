@@ -1,8 +1,15 @@
 import React, {useState,useCallback} from 'react';
 import { Upload } from '@mui/icons-material';
-const UploadDropDown = () => {
+import { useDispatch, useSelector } from 'react-redux';
+import { uploadFile } from '../../Redux/slices/fileUploadSlices';
+const UploadDropDown = ({ setPdfBlob, setHighlights }) => {
     const [file, setFile] = useState(null);
   const [error, setError] = useState("");
+  
+ 
+
+  const dispatch = useDispatch();
+  const {uploading, success, uploadError} = useSelector((state) => state.fileUpload);
   const handleDrop = useCallback((event)=>{
     event.preventDefault();
     const droppedFiles = Array.from(event.dataTransfer.files);
@@ -16,6 +23,18 @@ const UploadDropDown = () => {
   },[])
   const handleDragOver = (event) => {
     event.preventDefault(); 
+  };
+  const handleUpload = () => {
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64File = reader.result.split(',')[1];
+        console.log(base64File);
+        dispatch(uploadFile(base64File));
+   
+      };
+    }
   };
 
   const handleRemove = () => {
@@ -39,7 +58,13 @@ const UploadDropDown = () => {
         </div>
       )}
       {error && <p className="text-red-500 mt-2">{error}</p>}
+      {uploadError && <p className="text-red-500 mt-2">{uploadError}</p>}
+
+      {success && <p className="text-green-500 mt-2">File uploaded successfully</p>}
     </div>
+    <button className='bg-blue-500 hover:bg-blue-700 text-white text-center font-bold py-2 px-4 rounded' onClick={handleUpload} disabled={!file || uploading}>
+        {uploading ? 'Uploading...' : 'Upload File'}
+      </button>
     </>
   );
 }

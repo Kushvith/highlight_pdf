@@ -8,7 +8,7 @@ import HighlightCard from "./components/highlightCard/HighlightCard";
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import UploadDropDown from "./components/upload/UploadDropDown";
-const PdfHighlighter = ({ pdfBlob, highlights }) => {
+const PdfHighlighter = () => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages,setTotalPages] = useState(0);
@@ -17,6 +17,8 @@ const PdfHighlighter = ({ pdfBlob, highlights }) => {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [pdfBlob,setPdfBlob] = useState(null)
+  const [highlights, setHighlights] = useState(null)
   useEffect(() => {
     const createPdfWithHighlights = async () => {
       if (pdfBlob) {
@@ -58,7 +60,7 @@ const PdfHighlighter = ({ pdfBlob, highlights }) => {
 
     createPdfWithHighlights();
   }, [pdfBlob, highlights]);
-  const currentPageHighlights = highlights.filter(h => h.pageIndex === currentPage-1);
+  const currentPageHighlights = highlights?.filter(h => h.pageIndex === currentPage-1);
   const handleScroll = (e) => {
     const scrollTop = e.target.scrollTop;
     const newPage = Math.floor(scrollTop / pageHeight) + 1;
@@ -113,7 +115,7 @@ const PdfHighlighter = ({ pdfBlob, highlights }) => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <UploadDropDown/>
+          <UploadDropDown setPdfBlob={setPdfBlob} setHighlights={setHighlights}/>
         </Box>
       </Modal>
     <NavBar handleOpen={handleOpen}/>
@@ -140,7 +142,7 @@ const PdfHighlighter = ({ pdfBlob, highlights }) => {
                   }}
                 />
               ) : (
-                <p>Loading PDF...</p>
+                <p>Upload Pdf </p>
               )}
             </div>
           </div>
@@ -168,7 +170,7 @@ const PdfHighlighter = ({ pdfBlob, highlights }) => {
 
             
             <div className="relative">
-              {currentPageHighlights.length > 0 ? (
+              {currentPageHighlights?.length > 0 ? (
                 currentPageHighlights.map((highlight, index) => (
                   <HighlightCard key={index} highlight={highlight} />
                 ))
